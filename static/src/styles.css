@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Limpa o texto do placeholder no foco (funciona em navegadores modernos) */
+input:focus::placeholder {
+    color: transparent; /* Torna o texto do placeholder transparente */
+}
+
+/* Suporte para navegadores mais antigos (opcional, mas recomendado) */
+input:focus::-webkit-input-placeholder { color: transparent; }
+input:focus:-moz-placeholder { color: transparent; }
+input:focus::-moz-placeholder { color: transparent; }
+input:focus:-ms-input-placeholder { color: transparent; }

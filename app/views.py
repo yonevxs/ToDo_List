@@ -4,3 +4,5 @@ from django.http import HttpResponse
 
 def app(request):
     return render(request, 'index.html')
+def todo_list(request):
+    return render(request, 'todo_list.html')

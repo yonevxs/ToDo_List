@@ -1,10 +1,24 @@
-<html lang="pt-br">
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <title>Olá Template</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %} {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'dist/styles.css' %}">
 </head>
-<body>
-    <h1>Hello, World via Template!</h1>
-    <p>Bem-vindo à sua página Django usando templates.</p>
+<body class="bg-gradient-to-t from-sky-500 to-indigo-500">
+    <div class="h-screen bg-gradient-to-t from-sky-500 to-indigo-600">
+        <header>
+            <div class='bg-sky-900 px-20 p-4 shadow-lg'>
+                <h1 class="text-white text-4xl font-bold text-center">Minha Lista de Tarefas</h1>
+            </div>
+        </header>
+
+        <main>
+            {% block conteudo %}
+            {% endblock %}
+        </main>
+    </div>
 </body>
 </html>

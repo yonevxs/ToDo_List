@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+
+{% block titulo %} Minha Lista de Tarefas {% endblock %}
+
+{% block conteudo %}
+<div class="max-w-xl mx-auto mt-8 p-4 bg-white rounded-full shadow-lg flex items-center justify-between">
+    <form action="" class="flex mb-6">
+        <input type="text" id="nova-tarefa" placeholder="O que você precisa fazer?" class="flex-1 text-lg px-5 mt-5 mr-4 border-gray-300 rounded-l-lg focus:outline-none focus:outline-none focus:ring-0 text-gray-800 font-semibold" id='tarefa'>
+    </form>
+    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition duration-150 font-semibold shadow-md">Adicionar</button>
+</div>
+{% endblock %}]
