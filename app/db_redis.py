@@ -8,8 +8,9 @@ r = redis.Redis(
     password="cU01voxTnuo2BsTfhACs4ro1Hw0HYkuh",
 )
 
-def criar_tarefa(id,titulo, descricao,data_criacao,status):
+def criar_tarefa(titulo, descricao,data_criacao,status):
 
+    id = r.incr("proximo_id_tarefa")
     chave = f"tarefa:{id}"
     
     dados = {
@@ -20,6 +21,8 @@ def criar_tarefa(id,titulo, descricao,data_criacao,status):
     }
     r.hset(chave,mapping=dados)
 
+    return id
+
 
 def ler_tarefa(id):
     chave = f"tarefa:{id}"    
@@ -29,17 +32,16 @@ def ler_tarefa(id):
 def atulizar_tarefa(id,titulo= None, descricao = None ,data_criacao = None,status = None):
 
     chave = f"tarefa:{id}"
-
     dados = {}
 
     if titulo is not None:
         dados['titulo'] = titulo
     if descricao is not None:
-        descricao['descricao'] = descricao
+        dados['descricao'] = descricao
     if data_criacao is not None:
-        data_criacao['data_criacao'] =  data_criacao
+        dados['data_criacao'] =  data_criacao
     if status is not None:
-        status['status'] =  status
+        dados['status'] =  status
 
     if dados:
         r.hset(chave,mapping=dados)
@@ -51,12 +53,30 @@ def atulizar_tarefa(id,titulo= None, descricao = None ,data_criacao = None,statu
 def excluir_tarefa(id):
  
     chave = f"tarefa:{id}"
-    
 
-    deletar = r.hdel(chave)
+    deletar = r.delete(chave)
 
     if deletar == 1:
         return "Tarefa Deletada"
     else:
         return "Tarefa não Deletada"
+
+def listar_tarefas():
+    tarefas = []
+    # Busca todas as chaves que começam com "tarefa:"
+    chaves_tarefas = r.keys("tarefa:*")
+    
+    for chave in chaves_tarefas:
+        # Pega o ID da chave (ex: "tarefa:1" -> "1")
+        id_tarefa = chave.split(":")[-1]
+        
+        # Busca os dados do hash
+        dados_tarefa = r.hgetall(chave)
+        
+        # Adiciona o ID aos dados
+        dados_tarefa['id'] = id_tarefa
+        
+        tarefas.append(dados_tarefa)
+        
+    return tarefas
      
