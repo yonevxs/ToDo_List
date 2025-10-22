@@ -4,6 +4,6 @@
     "tailwindcss": "^4.1.15"
   },
   "scripts": {
-    "watch:css": "npx @tailwindcss/cli -i ./ToDo_List/static/src/styles.css -o ./ToDo_List/static/dist/styles.css --watch"
+    "watch:css": "npx tailwindcss -i ./static/src/styles.css -o ./static/dist/styles.css --watch"
   }
 }
