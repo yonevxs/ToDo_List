@@ -3,11 +3,107 @@
 {% block titulo %} Minha Lista de Tarefas {% endblock %}
 
 {% block conteudo %}
-<div class="max-w-xl mx-auto mt-8 p-4 bg-white rounded-full shadow-lg flex items-center justify-between">
-    <form action="" class="flex mb-6">
-        <input type="text" id="nova-tarefa" placeholder="O que você precisa fazer?" class="flex-1 text-lg px-5 mt-5 mr-4 border-gray-300 rounded-l-lg focus:outline-none focus:outline-none focus:ring-0 text-gray-800 font-semibold" id='tarefa'>
-    </form>
-    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition duration-150 font-semibold shadow-md">Adicionar</button>
 
+<div class="max-w-xl mx-auto mt-8 p-4 bg-white rounded-full shadow-lg flex items-center justify-between">
+    <form id='task_form' class="flex w-full mb-0"> {% csrf_token %}
+
+        <input type="text" id="task-input" name='titulo' placeholder="O que você precisa fazer?" class="flex-1 text-lg px-5 border-none focus:outline-none focus:ring-0 text-gray-800 font-semibold rounded-full" required>
+
+        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition duration-150 font-semibold shadow-md">Adicionar</button>
+    </form>
 </div>
-{% endblock %}]
+
+<div class="max-w-xl mx-auto">
+    <div id='task-list' class='mt-8'>
+        </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('task_form'); 
+        const input = document.getElementById('task-input');
+        const taskListContainer = document.getElementById('task-list');
+
+        // Pega o token CSRF do Django para o POST
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value; // Corrigido para pegar o .value
+
+        // Cria HTML da Tarefa
+        function createTask(tarefa){ // O nome da sua função está 'createTask'
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'bg-white bg-opacity-90 text-gray-900 p-4 rounded-lg mb-3 flex justify-between items-center shadow';
+
+            taskDiv.innerHTML = `
+                <span class="text-lg">
+                    ${tarefa.titulo}
+                    <span class="text-sm font-medium text-gray-600">(${tarefa.status})</span>
+                </span>
+                `;
+            return taskDiv;
+        }
+
+        // Busca tarefa
+        async function fetchTasks(){
+            try {
+                const response = await fetch('/api/tarefas/'); // Chama API GET
+                if (!response.ok) throw new Error('Erro ao buscar tarefas');
+                
+                const tarefas = await response.json(); // Converte a resposta em JSON
+                
+                // Limpa a lista antes de adicionar
+                taskListContainer.innerHTML = '';
+                
+                // Adiciona cada tarefa no HTML
+                tarefas.forEach(tarefa => {
+                    const taskElement = createTask(tarefa); // Usando sua função 'createTask'
+                    taskListContainer.appendChild(taskElement);
+                });
+
+            } catch (error) {
+                console.error('Erro:', error);
+                taskListContainer.innerHTML = '<p class="text-white text-center">Não foi possível carregar as tarefas.</p>';
+            }
+        }
+
+        // Lidar com envio do formulário
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Impede o recarregamento da página
+
+            const titulo = input.value.trim(); 
+            if (!titulo) return; 
+
+            try {
+                const response = await fetch('/api/tarefas/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf_token
+                    },
+                    body: JSON.stringify({
+                        titulo: titulo 
+                    })
+                });
+
+                if (response.status === 201) { // 201 = Created (Sucesso!)
+                    const novaTarefa = await response.json();
+                    
+                    const taskElement = createTask(novaTarefa); // Usando sua função 'createTask'
+                    taskListContainer.prepend(taskElement);
+                    
+                    input.value = ''; // Limpa o campo do formulário
+                } else {
+                    const erroData = await response.json();
+                    alert('Erro ao criar tarefa: ' + (erroData.erro || 'Erro desconhecido'));
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Uma falha de conexão ocorreu.');
+            }
+        });
+
+        // Chama a função para buscar as tarefas assim que a página carrega
+        fetchTasks();
+    });
+</script>
+{% endblock %}

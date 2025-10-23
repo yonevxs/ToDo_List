@@ -3,5 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.app, name='app'),
-    path('todo_list', views.todo_list, name='todo_list')
+    path('todo_list', views.todo_list, name='todo_list'),
+    
+    # URL da API (JSON)
+    path('api/tarefas/', views.tarefa_list_create, name='tarefa-api'),
 ]
