@@ -38,3 +38,29 @@ def tarefa_list_create(request):
         nova_tarefa['id'] = novo_id
 
         return Response(nova_tarefa, status = status.HTTP_201_CREATED)
+    
+@api_view(['GET', 'PATCH', 'DELETE'])
+def tarefa_update_delete(request, id):
+    if not db_redis.ler_tarefa(id):
+        return Response({'erro':'Tarefa não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+    try:
+        if request.method == 'GET':
+            tarefa = db_redis.ler_tarefa(id)
+            tarefa['id'] = id
+            return Response(tarefa)
+        elif request.method == 'PATCH': # Atualização parcial
+            novo_status = request.data.get('status')
+
+            if novo_status not in ['pendente', 'concluída']:
+                return Response({'erro':'Status inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            db_redis.atulizar_tarefa(id, status = novo_status)
+
+            tarefa_atualizada = db_redis.ler_tarefa(id)
+            tarefa_atualizada['id'] = id
+            return Response(tarefa_atualizada)
+        elif request.method == 'DELETE':
+            db_redis.excluir_tarefa(id)
+            return Response(status=status.HTTP_204_NO_CONTENT) # Sucesso, mas sem corpo da resposta
+    except Exception as e:
+        return Response({'erro':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

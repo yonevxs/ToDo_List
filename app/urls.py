@@ -7,4 +7,6 @@ urlpatterns = [
     
     # URL da API (JSON)
     path('api/tarefas/', views.tarefa_list_create, name='tarefa-api'),
+    path('api/tarefas/<int:id>/', views.tarefa_update_delete, name='tarefa-api-detail')
+
 ]
