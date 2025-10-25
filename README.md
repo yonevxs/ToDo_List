@@ -1,31 +1,31 @@
 # To-Do List com Django, Redis e TailwindCSS
 
-Um aplicativo de lista de tarefas (To-Do List) desenvolvido com Django. [cite_start]Este projeto utiliza Django Rest Framework [cite: 1] [cite_start]para a API, Redis [cite: 1] [cite_start](com `django-redis` [cite: 1]) para gerenciamento de dados ou cache, e Tailwind CSS para a estilização do front-end.
+Um aplicativo de lista de tarefas (To-Do List) desenvolvido com Django. Este projeto utiliza Django Rest Framework para a API, Redis (com `django-redis`) para gerenciamento de dados ou cache, e Tailwind CSS para a estilização do front-end.
 
 ## ✨ Features
 
 * Funcionalidade CRUD (Criar, Ler, Atualizar, Excluir) para tarefas.
 * Interface de usuário moderna estilizada com Tailwind CSS.
-* [cite_start]API RESTful construída com Django Rest Framework [cite: 1] para gerenciar as tarefas.
-* [cite_start]Integração com Redis [cite: 1] para alta performance no acesso aos dados.
+* API RESTful construída com Django Rest Framework para gerenciar as tarefas.
+* Integração com Redis para alta performance no acesso aos dados.
 
 ## 🛠️ Tecnologias Utilizadas
 
 **Backend & Banco de Dados:**
 * Python
-* [cite_start]Django [cite: 1]
-* [cite_start]Django Rest Framework [cite: 1]
-* [cite_start]Redis [cite: 1]
-* [cite_start]django-redis [cite: 1]
+* Django
+* Django Rest Framework
+* Redis
+* django-redis
 
 **Frontend:**
 * HTML
 * Tailwind CSS
 
 **Outras dependências (do `requirements.txt`):**
-* [cite_start]asgiref [cite: 1]
-* [cite_start]sqlparse [cite: 1]
-* [cite_start]tzdata [cite: 1]
+* asgiref
+* sqlparse
+* tzdata
 
 ## 🚀 Pré-requisitos
 
