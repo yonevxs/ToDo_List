@@ -22,14 +22,15 @@ def tarefa_list_create(request):
     
     elif request.method == 'POST':
         titulo = request.data.get('titulo') # como o DRF pega o JSON do front-end
+        descricao = request.data.get('descricao', '')
         if not titulo:
             return Response({'erro': "O título é obrigatório"}, status=status.HTTP_400_BAD_REQUEST) 
         
-        data_atual = datetime.date.today().isoformat()
+        data_atual = datetime.datetime.now().isoformat()
 
         novo_id = db_redis.criar_tarefa(
             titulo = titulo,
-            descricao = request.data.get('descricao', ''),
+            descricao = descricao,
             data_criacao = data_atual,
             status = 'pendente'
         )
@@ -51,7 +52,7 @@ def tarefa_update_delete(request, id):
         elif request.method == 'PATCH': # Atualização parcial
             novo_status = request.data.get('status')
 
-            if novo_status not in ['pendente', 'concluída']:
+            if novo_status not in ['pendente', 'em andamento', 'concluída']:
                 return Response({'erro':'Status inválido.'}, status=status.HTTP_400_BAD_REQUEST)
             
             db_redis.atulizar_tarefa(id, status = novo_status)
