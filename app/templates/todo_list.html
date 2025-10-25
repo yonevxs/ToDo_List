@@ -13,6 +13,7 @@
                   class="w-full text-md px-5 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 h-20 resize-y"></textarea>
 
         <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-150 font-semibold shadow-md">Adicionar</button>
+        
     </form>
 </div>
 
@@ -23,19 +24,31 @@
 
 
 <script>
+    // As constantes SVG devem estar aqui, fora de qualquer função
+    const SVG_EDITAR = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                        class="size-6 btn-editar text-gray-500 hover:text-blue-500 cursor-pointer">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13L2 22l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                        </svg>`;
+
+    const SVG_SALVAR = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                        class="size-6 btn-salvar text-green-500 hover:text-green-600 cursor-pointer">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>`;
+
+
     document.addEventListener('DOMContentLoaded', () => {
-        const form = document.getElementById('task_form'); 
+        const form = document.getElementById('task_form');
         const inputTitulo = document.getElementById('task-input');
         const inputDescricao = document.getElementById('description-input');
         const taskListContainer = document.getElementById('task-list');
 
         // Pega o token CSRF do Django para o POST
-        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value; 
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
         // Captura a data da tarefa
-        function formatarData(dataString){
-            if(!dataString) return 'Data indisponível';
-            const data= new Date(dataString);
+        function formatarData(dataString) {
+            if (!dataString) return 'Data indisponível';
+            const data = new Date(dataString);
             return data.toLocaleDateString('pt-BR', {
                 year: 'numeric',
                 month: '2-digit',
@@ -46,12 +59,12 @@
         }
 
         // Cria HTML da Tarefa
-        function createTask(tarefa){ 
+        function createTask(tarefa) {
             const taskDiv = document.createElement('div');
 
             // Add ID da tarefa ao div pai
             taskDiv.dataset.id = tarefa.id;
-            
+
             const isConcluida = tarefa.status == 'concluída';
             const isEmAndamento = tarefa.status == 'em andamento';
             const andamentoColor = isEmAndamento ? 'text-yellow-500' : 'text-gray-500';
@@ -59,50 +72,57 @@
             taskDiv.className = 'bg-white bg-opacity-90 text-gray-900 p-4 rounded-lg mb-3 flex flex-col shadow';
 
             taskDiv.innerHTML = `
-                <div class='flex justify-between items-start'>
-                    <div class='flex flex-col'>
-                        <span class="text-lg ${isConcluida ? 'line-through text-gray-500' : 'text-gray-800'}">
-                            ${tarefa.id} - ${tarefa.titulo}
-                            <span class="text-sm font-medium text-gray-600">(${tarefa.status})</span>
-                        </span>
-                        ${tarefa.descricao ? `<p class='text-sm text-gray-500 mt-1 italic'>${tarefa.descricao}</p>`: ''}
+                <div class='flex justify-between items-start w-full'>
+                    <div class='flex flex-col w-full mr-4'>
+
+                        <input type="text" value="${tarefa.id} - ${tarefa.titulo}" 
+                            class="task-title text-lg font-bold bg-transparent border-none focus:outline-none p-0 w-full 
+                                ${isConcluida ? 'line-through text-gray-500' : 'text-gray-800'}"
+                            data-campo="titulo-visual" readonly>
+
+                        <span class='text-sm font-medium text-gray-600 mt-1' data-campo="statusText">(${tarefa.status})</span>
+
+                        <textarea class='task-input text-sm text-gray-500 mt-1 italic w-full resize-none bg-transparent border-none focus:outline-none' 
+                                data-campo="descricao" rows="2" readonly>${tarefa.descricao || ''}</textarea>
                     </div>
 
-                    <div class='flex space-x-2 flex-shrink-0'>
+                    <div class='flex space-x-2 flex-shrink-0 task-actions'>
+                        
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
-                            class="size-6 btn-concluir ${isConcluida ? 'text-green-500' : 'text-gray-500'} hover:text-green-500 cursor-pointer">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        class="size-6 btn-concluir ${isConcluida ? 'text-green-500' : 'text-gray-500'} hover:text-green-500 cursor-pointer">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                         
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
                         class="size-6 btn-em-andamento ${andamentoColor} hover:text-yellow-600 cursor-pointer">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                         </svg>
-
-
+                        
+                        ${SVG_EDITAR}
+                        
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
                             class="size-6 btn-excluir text-gray-500 hover:text-red-500 cursor-pointer">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                         </svg>
                     </div>
                 </div>
                 <p class='text-xs text-gray-400 mt-2 border-t pt-2 border-gray-100'>
                     Criado em: ${formatarData(tarefa.data_criacao)}
                 </p>
-
                 `;
             return taskDiv;
         }
 
         // Função para aplicar estilos de status na UI
         function updateTaskUI(taskDiv, newStatus) {
-            const titleSpan = taskDiv.querySelector('span.text-lg');
-            const statusTextSpan = taskDiv.querySelector('span.text-sm');
+            // Seletor ajustado para o input do título
+            const titleInput = taskDiv.querySelector('input[data-campo="titulo-visual"]');
+            const statusTextSpan = taskDiv.querySelector('span[data-campo="statusText"]');
             const btnConcluir = taskDiv.querySelector('.btn-concluir');
             const btnAndamento = taskDiv.querySelector('.btn-em-andamento');
 
             // Limpa classes de estilo anteriores
-            titleSpan.classList.remove('line-through', 'text-gray-500', 'text-gray-800');
+            titleInput.classList.remove('line-through', 'text-gray-500', 'text-gray-800');
             btnConcluir.classList.remove('text-green-500', 'text-gray-500');
             btnAndamento.classList.remove('text-yellow-500', 'text-gray-500');
 
@@ -110,34 +130,79 @@
             statusTextSpan.innerText = `(${newStatus})`;
 
             if (newStatus === 'concluída') {
-                titleSpan.classList.add('line-through', 'text-gray-500');
+                titleInput.classList.add('line-through', 'text-gray-500');
                 btnConcluir.classList.add('text-green-500');
                 btnAndamento.classList.add('text-gray-500');
             } else if (newStatus === 'em andamento') {
-                titleSpan.classList.add('text-gray-800');
+                titleInput.classList.add('text-gray-800');
                 btnConcluir.classList.add('text-gray-500');
                 btnAndamento.classList.add('text-yellow-500');
             } else { 
-                titleSpan.classList.add('text-gray-800');
+                titleInput.classList.add('text-gray-800');
                 btnConcluir.classList.add('text-gray-500');
                 btnAndamento.classList.add('text-gray-500');
             }
         }
 
+        async function handleEditSave(id, taskDiv, csrf_token) {
+            // O título NÃO é mais lido, apenas a descrição
+            const descricaoTextarea = taskDiv.querySelector('textarea[data-campo="descricao"]');
+            
+            // Enviamos um título VAZIO ou o valor do input (depende da sua API)
+            // Se sua API for PATCH, é melhor não enviar o campo 'titulo' se ele não foi alterado.
+            // Aqui, vamos apenas ler a descrição.
+            const novaDescricao = descricaoTextarea.value.trim();
+            
+            try {
+                const response = await fetch(`/api/tarefas/${id}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf_token
+                    },
+                    body: JSON.stringify({
+                        // Apenas envia a descrição
+                        descricao: novaDescricao 
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.erro || 'Falha ao salvar edição');
+                }
+
+                // Volta ao modo readonly
+                descricaoTextarea.setAttribute('readonly', true);
+                
+                // Troca o botão SALVAR de volta para EDITAR (Lápis)
+                const btnSalvar = taskDiv.querySelector('.btn-salvar');
+                if (btnSalvar) {
+                    btnSalvar.outerHTML = SVG_EDITAR;
+                }
+                
+                // Remove os estilos de borda
+                descricaoTextarea.style.border = 'none';
+                
+            } catch (error) {
+                console.error('Erro ao salvar edição:', error);
+                alert('Erro ao salvar edição: ' + error.message);
+            }
+        }
+
         // Busca tarefa
-        async function fetchTasks(){
+        async function fetchTasks() {
             try {
                 const response = await fetch('/api/tarefas/'); // Chama API GET
                 if (!response.ok) throw new Error('Erro ao buscar tarefas');
-                
+
                 const tarefas = await response.json(); // Converte a resposta em JSON
-                
+
                 // Limpa a lista antes de adicionar
                 taskListContainer.innerHTML = '';
-                
+
                 // Adiciona cada tarefa no HTML
                 tarefas.forEach(tarefa => {
-                    if(!tarefa.data_criacao){
+                    if (!tarefa.data_criacao) {
                         tarefa.data_criacao = new Date().toISOString();
                     }
                     const taskElement = createTask(tarefa); // Usando sua função 'createTask'
@@ -154,9 +219,9 @@
         form.addEventListener('submit', async (event) => {
             event.preventDefault(); // Impede o recarregamento da página
 
-            const titulo = inputTitulo.value.trim(); 
+            const titulo = inputTitulo.value.trim();
             const descricao = inputDescricao ? inputDescricao.value.trim() : '';
-            if (!titulo) return; 
+            if (!titulo) return;
 
             try {
                 const response = await fetch('/api/tarefas/', {
@@ -167,22 +232,22 @@
                     },
                     body: JSON.stringify({
                         titulo: titulo,
-                        descricao: descricao 
+                        descricao: descricao
                     })
                 });
 
                 if (response.status === 201) { // 201 = Created (Sucesso!)
                     const novaTarefa = await response.json();
-                    
-                    if(!novaTarefa.data_criacao){
+
+                    if (!novaTarefa.data_criacao) {
                         novaTarefa.data_criacao = new Date().toISOString();
                     }
 
                     const taskElement = createTask(novaTarefa); // Usando sua função 'createTask'
                     taskListContainer.prepend(taskElement);
-                    
+
                     inputTitulo.value = ''; // Limpa o campo do formulário
-                    if(inputDescricao){
+                    if (inputDescricao) {
                         inputDescricao.value = '';
                     }
                 } else {
@@ -200,25 +265,59 @@
         fetchTasks();
 
         // Adiciona um event listener ao container PAI
-        taskListContainer.addEventListener('click', async(event) =>{
-            
+        taskListContainer.addEventListener('click', async (event) => {
+
             // Captura o ícone clicado
             const clickElement = event.target.closest('svg');
-            if(!clickElement) return; // Não ocorre nada se não for svg
-            
+            if (!clickElement) return; // Não ocorre nada se não for svg
+
             // Div da tarefa
             const taskDiv = clickElement.closest('[data-id]');
-            if(!taskDiv) return;
+            if (!taskDiv) return;
 
             const id = taskDiv.dataset.id; // ID da tarefa
             let newStatus = null;
             let shouldUpdate = false;
-            
-            const statusTextSpan = taskDiv.querySelector('span.text-sm');
-            const currentStatus = statusTextSpan.innerText.replace(/[()]/g, '');
 
-            if(clickElement.classList.contains('btn-em-andamento')){
-                if(currentStatus === 'em andamento'){
+            const statusTextSpan = taskDiv.querySelector('span.text-sm');
+            const currentStatus = statusTextSpan.innerText.replace(/[()]/g, '').trim();
+
+            // LÓGICA DE EDIÇÃO/SALVAR (APENAS DESCRIÇÃO)
+            const btnEditar = clickElement.closest('.btn-editar');
+            const btnSalvar = clickElement.closest('.btn-salvar');
+
+            if (btnEditar || btnSalvar) {
+                // Apenas precisamos da descrição agora
+                const descricaoTextarea = taskDiv.querySelector('textarea[data-campo="descricao"]');
+
+                if (btnEditar) {
+                    // MODO 1: ATIVAR EDIÇÃO (LÁPIS -> SALVAR)
+                    
+                    // Apenas a descrição se torna editável
+                    descricaoTextarea.removeAttribute('readonly');
+
+                    // Adiciona um estilo visual simples para indicar edição
+                    descricaoTextarea.style.border = '1px solid #6366f1';
+
+                    descricaoTextarea.focus();
+                    
+                    // Troca o lápis pelo ícone de salvar
+                    clickElement.outerHTML = SVG_SALVAR;
+
+                } else if (btnSalvar) {
+                    // MODO 2: SALVAR EDIÇÃO (SALVAR -> LÁPIS)
+                    
+                    // Chama a função de PATCH para salvar no servidor
+                    // handleEditSave já cuida de reverter o readonly e o ícone
+                    await handleEditSave(id, taskDiv, csrf_token);
+                }
+                // Interrompe o fluxo para não disparar outras ações
+                return;
+            }
+
+            // LÓGICA DE STATUS (Mantida)
+            if (clickElement.classList.contains('btn-em-andamento')) {
+                if (currentStatus === 'em andamento') {
                     newStatus = 'pendente';
                 } else {
                     newStatus = 'em andamento';
@@ -226,16 +325,16 @@
                 shouldUpdate = true;
             }
 
-            if(clickElement.classList.contains('btn-concluir')){
-                if(currentStatus === 'concluída'){
+            if (clickElement.classList.contains('btn-concluir')) {
+                if (currentStatus === 'concluída') {
                     newStatus = 'em andamento';
-                } else{
+                } else {
                     newStatus = 'concluída';
                 }
                 shouldUpdate = true;
             }
-            if(shouldUpdate){
-                try{
+            if (shouldUpdate) {
+                try {
                     const response = await fetch(`/api/tarefas/${id}/`, {
                         method: 'PATCH',
                         headers: {
@@ -246,32 +345,33 @@
                             status: newStatus // Envia o novo status
                         })
                     });
-                    if(!response.ok) throw new Error('Falha ao atualizar tarefa');
+                    if (!response.ok) throw new Error('Falha ao atualizar tarefa');
                     updateTaskUI(taskDiv, newStatus);
-                    
-                } catch (error){
+
+                } catch (error) {
                     console.error('Erro ao concluir:', error)
                     alert('Não foi possível marcar a tarefa como concluída.');
                 }
             }
 
-            if(clickElement.classList.contains('btn-excluir')){
-                if(!confirm('Tem certeza que deseja excluir esta tarefa?')){
+            // LÓGICA DE EXCLUIR (Mantida)
+            if (clickElement.classList.contains('btn-excluir')) {
+                if (!confirm('Tem certeza que deseja excluir esta tarefa?')) {
                     return
                 }
-                try{
-                    const response = await fetch(`/api/tarefas/${id}/`,{
-                        method:'DELETE',
+                try {
+                    const response = await fetch(`/api/tarefas/${id}/`, {
+                        method: 'DELETE',
                         headers: {
-                            'X-CSRFToken':csrf_token
+                            'X-CSRFToken': csrf_token
                         }
                     });
-                    if(response.status === 204){
+                    if (response.status === 204) {
                         taskDiv.remove();
                     } else {
                         throw new Error('Falhas ao excluir a tarefa.');
                     }
-                } catch(error){
+                } catch (error) {
                     console.error('Erro ao excluir: ', error);
                     alert('Não foi possível excluir a tarefa.');
                 }

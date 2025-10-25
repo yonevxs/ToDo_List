@@ -44,24 +44,47 @@ def tarefa_list_create(request):
 def tarefa_update_delete(request, id):
     if not db_redis.ler_tarefa(id):
         return Response({'erro':'Tarefa não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+    
     try:
         if request.method == 'GET':
             tarefa = db_redis.ler_tarefa(id)
             tarefa['id'] = id
             return Response(tarefa)
+        
         elif request.method == 'PATCH': # Atualização parcial
-            novo_status = request.data.get('status')
-
-            if novo_status not in ['pendente', 'em andamento', 'concluída']:
-                return Response({'erro':'Status inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+            dados_para_atualizar = {}
             
-            db_redis.atulizar_tarefa(id, status = novo_status)
+            # 1. VALIDAÇÃO E ATUALIZAÇÃO DO STATUS
+            novo_status = request.data.get('status')
+            if novo_status is not None:
+                if novo_status not in ['pendente', 'em andamento', 'concluída']:
+                    return Response({'erro':'Status inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+                dados_para_atualizar['status'] = novo_status
+            
+            # 2. ATUALIZAÇÃO DA DESCRIÇÃO (Se o campo estiver presente na requisição)
+            nova_descricao = request.data.get('descricao')
+            if nova_descricao is not None:
+                dados_para_atualizar['descricao'] = nova_descricao
+            
+            # 3. ATUALIZAÇÃO DO TÍTULO (Se o campo estiver presente na requisição)
+            novo_titulo = request.data.get('titulo')
+            if novo_titulo is not None:
+                dados_para_atualizar['titulo'] = novo_titulo
+            
+            # Checa se pelo menos um campo válido foi enviado
+            if not dados_para_atualizar:
+                return Response({'erro':'Nenhum campo válido para atualizar.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            # Chama a função de atualização, passando os dados coletados
+            db_redis.atulizar_tarefa(id, **dados_para_atualizar)
 
             tarefa_atualizada = db_redis.ler_tarefa(id)
             tarefa_atualizada['id'] = id
             return Response(tarefa_atualizada)
+        
         elif request.method == 'DELETE':
             db_redis.excluir_tarefa(id)
-            return Response(status=status.HTTP_204_NO_CONTENT) # Sucesso, mas sem corpo da resposta
+            return Response(status=status.HTTP_204_NO_CONTENT)
+            
     except Exception as e:
         return Response({'erro':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
