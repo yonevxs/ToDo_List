@@ -11,21 +11,39 @@ Um aplicativo de lista de tarefas (To-Do List) desenvolvido com Django. Este pro
 
 ## 🛠️ Tecnologias Utilizadas
 
-**Backend & Banco de Dados:**
-* Python
-* Django
-* Django Rest Framework
-* Redis
-* django-redis
+### ⚙️ **Backend & Banco de Dados**
+<div>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="40" height="40" alt="Python"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg" width="40" height="40" alt="Django"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="40" height="40" alt="Redis"/>
+</div>
 
-**Frontend:**
-* HTML
-* Tailwind CSS
+**Principais tecnologias e dependências:**
+- **Python** – Linguagem principal da aplicação.  
+- **Django** – Framework web para desenvolvimento robusto e escalável.  
+- **Django Rest Framework (DRF)** – Criação e gerenciamento de APIs RESTful.  
+- **Redis** – Armazenamento em cache e gerenciamento de sessões.  
+- **django-redis** – Integração do Redis com o Django para cache e otimização.  
 
-**Outras dependências (do `requirements.txt`):**
-* asgiref
-* sqlparse
-* tzdata
+---
+
+### 🎨 **Frontend**
+<div>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="40" height="40" alt="HTML5"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" width="40" height="40" alt="TailwindCSS"/>
+</div>
+
+**Principais tecnologias:**
+- **HTML5** – Estruturação semântica das páginas.  
+- **Tailwind CSS** – Framework CSS utilitário para estilização responsiva e moderna.  
+
+---
+
+### 📦 **Outras dependências (do `requirements.txt`)**
+- **asgiref** – Suporte para aplicações assíncronas no Django.  
+- **sqlparse** – Formatação e análise de consultas SQL.  
+- **tzdata** – Gerenciamento de fusos horários para aplicações Django.  
+
 
 ## 🚀 Pré-requisitos
 
