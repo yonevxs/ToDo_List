@@ -123,3 +123,14 @@ O projeto inclui um script `main.py` que permite testar as operações CRUD dire
     ```bash
     python main.py
     ```
+---
+
+## 👥 Contribuidores
+
+Este projeto foi desenvolvido pela seguinte equipe:
+
+* **Gabriel Nobre**
+* **Gustavo Lemos**
+* **Kalebe Menezes**
+* **Lucas Neves**
+* **Nicolas da Silva**
